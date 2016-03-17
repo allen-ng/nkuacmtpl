@@ -8,8 +8,12 @@ namespace acm {
 		typedef long long ll;
 
 		// untested
+		// naive C(n, m) % mod
+		ll C(ll n, ll m, ll mod) {
+		}
+		// untested
 		ll lucas(ll n, ll m, ll mod) {
-			return n / m * lucas(n % mod, m % mod) % mod;
+			return lucas(n / p, m / p, mod) * C(n % mod, m % mod, mod) % mod;
 		}
 	}
 }

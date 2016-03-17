@@ -57,6 +57,31 @@ namespace acm {
 			build_lcp(stp, s); 
 		} // build suffix array
 
+		namespace trie {
+			const int maxn = 2555;
+			class Node {
+				map<char, Node*> branch;
+				bool isWord = false;
+				char c = 0;
+			} pool;
+			int p = 1;
+			void insert(string& s) {
+				Node* root = pool;
+				int sz = s.size();
+				for(int i = 0; i < sz; i++) {
+					Node* next = 0;
+					if(root->branch.find(s[i]) == root->branch.end()) {
+						next = &pool[p++];
+						next->c = s[i];
+						root->branch[s[i]] = next;
+					}
+					else
+						next =root->branch[s[i]];
+					root = next;
+				}
+				root->isWord = true;
+			}
+		}// namespace trie
 	} // namespace str
 } // namespace acm
 
