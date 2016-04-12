@@ -82,6 +82,84 @@ namespace acm {
 				root->isWord = true;
 			}
 		}// namespace trie
+
+		namespace ac_automaton {
+			#include <bits/stdc++.h>
+      using namespace std;
+
+      const int maxn = 10000;
+      struct AC {
+      	map<int, AC*> next;
+      	int c;
+      	int cnt = 0;
+      	AC* fail = NULL, *fa = NULL;
+      } nodes[maxn];
+      int p = 1;
+      AC* root;
+
+      void init_ac() {
+      	root = nodes;
+      	root->c = 0;
+      	root->fail = NULL;
+      	root->fa = NULL;
+      }
+
+      void insert(string& s) {
+      	AC* curr = root;
+      	for(auto c : s) {
+      		if(curr->next.find(c) == curr->next.end()) {
+      			curr->next.insert(make_pair(c, &(nodes[p++])));
+      			curr->next[c]->c = c;
+      			curr->next[c]->fa = curr;
+      		}
+      		curr = curr->next[c];
+      	}
+      	curr->cnt++;
+      }
+
+      void build_ac() {
+      	static queue<AC*> q;
+      	for(auto pr : root->next) {
+      		q.push(pr.second);
+      	}
+      	AC* curr;
+      	while(!q.empty()) {
+      		AC* rt = q.front();
+      		q.pop();
+      		for(auto pr : rt->next) {
+      			q.push(pr.second);
+      		}
+      		curr = rt->fa == NULL ? NULL : rt->fa->fail;
+      		while(curr != NULL) {
+      			if(curr->next.find(rt->c) == curr->next.end()) {
+      				curr = curr->fail;
+      			} else {
+      				rt->fail = curr->next[rt->c];
+      				break;
+      			}
+      		}
+      		if(curr == NULL) {
+      			rt -> fail = root;
+      		}
+      	}
+      }
+
+      void query(string& s) {
+      	AC* curr = root;
+      	for(auto c : s) {
+      		while(curr != root && curr->next.find(c) == curr->next.end()) {
+      			curr = curr->fail;
+      		}
+      		if(curr == root && curr->next.find(c) == curr->next.end()) continue;
+      		curr = curr->next[c];
+      		if(curr->cnt != 0) {
+      			cout<<"YES"<<endl;
+      			return;
+      		}
+      	}
+      	cout<<"NO"<<endl;
+      }
+    } // namespace ac_automaton
 	} // namespace str
 } // namespace acm
 
