@@ -243,6 +243,42 @@ namespace acm {
 			}
 		} // namespace sam
 
+		namespace manacher { //求最长回文子串
+			const int maxn = 10010;
+			int P[maxn];
+			char s[maxn];
+			char str[maxn<<1]; //需要提前准备数据, 参考下面的preparing data
+			int manacher(int j) {
+				// preparing data
+				/*
+					 int j = 1;
+					 for(int i = 0; i < len; i++) {
+					 str[j] = s[i];
+					 str[j + 1] = '#';
+					 j += 2;
+					 }
+					 */
+				str[0] = '#';
+				int mx = -1;
+				int id, ans = -1;
+				for(int i = 0; i < j; i++) {
+					if(mx > i) 
+						P[i] = min(P[2 * id - i], mx - i);
+					else
+						P[i] = 1;
+					while(i - P[i] >= 0 && i + P[i] < j && str[i + P[i]] == str[i - P[i]]) 
+						P[i]++;
+					if(P[i] + i > mx) {
+						mx = P[i] + i;
+						id = i;
+					}
+					ans = max(P[i] - 1, ans);
+				}
+				return ans;
+
+			}
+		} // namespace manacher
+
 	} // namespace str
 } // namespace acm
 
