@@ -52,6 +52,28 @@ namespace acm {
 				return 1.0*(-C - double(A) *x)/B;
 			}
 		};
+
+		// 叉乘
+		ll cross(const Point& a, const Point& b, const Point& c) {
+				return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x -  a.x);
+		}
+
+		// 凸包, !!顺时针!!, 不包含重复点
+		vector<Point> convexHull(vector<Point>& p) {
+			int n = p.size();
+			if(n <= 1) return p;
+			sort(p.begin(), p.end(), [](const Point& a, const Point& b) -> bool {
+					return a.x != b.x ? a.x < b.x : a.y < b.y;
+					});
+			vector<Point> q = vector<Point>(n * 2);
+			int cnt = 0;
+			for(int i = 0; i < n; q[cnt++] = p[i++])
+				for(; cnt > 1 && cross(q[cnt - 2], q[cnt - 1], p[i]) >= 0; --cnt);
+			for(int i = n - 2, t = cnt; i >= 0; q[cnt++] = p[i--]) 
+				for(; cnt > t && cross(q[cnt - 2], q[cnt - 1], p[i]) >= 0; --cnt);
+			int sz = cnt - 1 - (q[0].x == q[1].x && q[0].y == q[1].y ? 1 : 0);
+			return vector<Point>(q.begin(), q.begin() + sz);
+		}
 	} // geometry
 } //acm
 

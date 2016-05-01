@@ -61,6 +61,36 @@ namespace acm {
 		inline ll reverse(ll a, ll p) {
 			return qpow(a, p - 2, p);
 		}
+
+		// 线性同余方程(x === A[i] (mod M[i])), M[i] 不一定互质, 但是需要lcm不太大
+		ll M[maxn], A[maxn];
+		int N;
+
+		ll lcm[maxn];
+		void init() {
+			ll g;
+			lcm[0] = M[0];
+			rep(i, 1, N) {
+				g = gcd(lcm[i - 1], M[i]);
+				lcm[i] = lcm[i - 1] * (M[i] / g);
+			}
+		}
+		ll linear_mod_equation() {
+			init();
+			ll a = A[0];
+			rep(i, 1, N) {
+				ll g, k0, k, _;
+				g = extgcd(lcm[i - 1], M[i],k0,_);
+				if((A[i] - a) % g != 0) return -1;
+				k0 = (k0 * ((A[i] - a) / g));
+				while(k0 < 0) k0 += M[i];
+				k0 %= M[i];
+				a = ((k0 * lcm[i - 1] + a) + lcm[i]) % lcm[i];
+			}
+			return a == 0 ? lcm[N - 1] : a;
+		}
+
+
 	}
 }
 #endif
