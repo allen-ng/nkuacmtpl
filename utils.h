@@ -32,7 +32,6 @@ namespace acm {
 		// O(logn)
 		ll qpow(ll a, ll n, ll mod) {
 			a %= mod;
-			n %= mod;
 			ll ans = 1LL;
 			while(n) {
 				if(n & 1) ans = (ans* a% mod);
