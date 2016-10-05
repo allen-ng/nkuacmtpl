@@ -151,9 +151,10 @@ namespace acm {
 					void hld(int cur, int fa = -1) {
 						if(cHead[totC] == -1) cHead[totC] = cur;
 						cInd[cur] = totC;
-						cPos[cur] = ++cSz[totC];
+						cPos[cur] = cSz[totC];
 						// varies
 						a[cSz[totC] + 1] = val[cur];
+						cSz[totC]++;
 
 						int ind = -1, mai = -1;
 						int cnt = 0;
