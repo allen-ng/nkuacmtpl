@@ -4,58 +4,47 @@
 
 namespace acm {
 	namespace str {
-#include <bits/stdc++.h>
-		using namespace std;
-		const int maxn = 1e5;
-
-		struct entry {
-			int nr[2];
-			int p; // Position
-			bool operator<(const entry& b) const{ 
-				bool l0 = nr[0] < b.nr[0],
-						 l1 = nr[1] < b.nr[1];
-				return nr[0] == b.nr[0] ? l1 : l0;
-			}
-		} L[maxn]; // The real suffix array
-
-		int P[2][maxn];// Rank
-		int LCP[maxn]; // height/Logest Common Prefix, from 1
-		int stp; // used to access P
-
-
-		// O(n) build lcp
-		void build_lcp(int stp, string& s) {
-			int i, j, k = 0;
-			int n = s.size();
-			// P[stp][i] is rank array
-			for(i = 0; i < n; LCP[P[stp][i++]] = k) {
-				for(k ? k-- : 0, j = L[P[stp][i] - 1].p; j + k < n && s[i + k] == s[j + k]; k++);
-			}
-		}
-
-		// O(nlog^2n) build suffix array
-		void build_suffix_array(string& s) {
-			int N, i;
-			int cnt;
-			N = s.size();
-			for(i = 0; i < N; i++) {
-				P[0][i] = s[i] - 'a';
-			}
-			for(stp = 1, cnt = 1; cnt < N; stp ^= 1, cnt *= 2) {
-				for(i = 0; i < N; i++) {
-					L[i].nr[0] = P[stp ^ 1][i];
-					L[i].nr[1] = i + cnt < N ? P[stp ^ 1][i + cnt] : -1;
-					L[i].p = i;
+		namespace SuffixArray { // O(n)
+			int cntA[maxn], cntB[maxn];
+			int A[maxn], B[maxn];
+			int sa[maxn], tsa[maxn];
+			int rank[maxn], lcp[maxn];
+			template<typename T, int sig>
+				void build(T* ch, int n) {
+					rep(i, 0, sig) cntA[i] = 0;
+					rep(i, 1, n + 1) cntA[ch[i]] ++;
+					rep(i, 1, sig) cntA[i] += cntA[i - 1];
+					rer(i, n, 1) sa[cntA[ch[i]] --] = i;
+					rank[sa[1]] = 1;
+					rep(i, 2, n + 1) {
+						rank[sa[i]] = rank[sa[i - 1]];
+						if (ch[sa[i]] != ch[sa[i - 1]]) rank[sa[i]] ++;
+					}
+					for (int l = 1; rank[sa[n]] < n; l <<= 1) {
+						rep(i, 0, n + 1) cntA[i] = 0;
+						rep(i, 0, n + 1) cntB[i] = 0;
+						rep(i, 1, n + 1) {
+							cntA[A[i] = rank[i]] ++;
+							cntB[B[i] = (i + l <= n) ? rank[i + l] : 0] ++;
+						}
+						rep(i, 1, n + 1) cntB[i] += cntB[i - 1];
+						rer(i, n, 1) tsa[cntB[B[i]] --] = i;
+						rep(i, 1, n + 1) cntA[i] += cntA[i - 1];
+						rer(i, n, 1) sa[cntA[A[tsa[i]]] --] = tsa[i];
+						rank[sa[1]] = 1;
+						rep(i, 2, n + 1) {
+							rank[sa[i]] = rank[sa[i - 1]];
+							if (A[sa[i]] != A[sa[i - 1]] || B[sa[i]] != B[sa[i - 1]]) rank[sa[i]] ++;
+						}
+					}
+					for (int i = 1, j = 0; i <= n; i ++) {
+						if (j) j --;
+						while (ch[i + j] == ch[sa[rank[i] - 1] + j]) j ++;
+						lcp[rank[i]] = j;
+					}
 				}
-				// Can be altered to a 2-pass bucket
-				sort(L, L + N);
-				for(i = 0; i < N; i++) {
-					// Calculate rank of index L[i].p, and thinking of the same rank
-					P[stp][L[i].p] = i > 0 && L[i].nr[0]==L[i-1].nr[0] && L[i].nr[1] == L[i- 1].nr[1] ? P[stp][L[i-1].p] : i;
-				}
-			}
-			build_lcp(stp, s); 
-		} // build suffix array
+		};
+
 
 		namespace trie {
 			const int maxn = 2555;
