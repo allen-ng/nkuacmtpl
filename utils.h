@@ -192,6 +192,19 @@ namespace acm {
 				}
 			}
 		}
+		/* stk is a vector */
+		/* this is for minimizing y * _ + x, _ is decreasing */
+		/* (y, x) should be increasing to couple with ccw >= 0 */
+		rep(i,1,n+1) {
+			while(stk.size() > 1 && ccw(stk[stk.size() - 2], stk.back(), i - 1) >= 0)
+				stk.pop_back();
+			l = min(l, (int) stk.size() - 1);
+			l = max(l, 0);
+			stk.pb(i-1);
+			while(l+1<stk.size() && 1*x[stk[l+1]]-rev[i]*y[stk[l+1]]<=1*x[stk[l]]-rev[i]*y[stk[l]])
+				l++;
+			// dp[now][i]+=1*x[stk[l]]-rev[i]*y[stk[l]];
+		}
 
 	}
 }
